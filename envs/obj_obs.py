@@ -69,7 +69,7 @@ class obj_obs(Base_task):
             self.scene,
             sapien.Pose(p=[0, 0, 0.74]),
             length=2,
-            width=5,
+            width=4,
             height=0.78,
             thickness=0.05,
             is_static=self.table_static
