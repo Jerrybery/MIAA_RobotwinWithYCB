@@ -3,6 +3,7 @@ import numpy as np
 import transforms3d as t3d
 import sapien.physx as sapienp
 import json
+import os
 
 # create box
 def create_box(
@@ -298,8 +299,18 @@ def create_actor(
                 model_z_val = model_z_val
             )
         except:
-            print(modelname, 'is not exsist model file!')
-            return None, None
+            try:
+                return create_urdf_obj(              scene = scene,
+                    pose = pose,
+                    modelname = modelname,
+                    scale = scale,
+                    convex = convex,
+                    is_static = is_static,
+                    model_id = model_id,
+                    model_z_val = model_z_val)
+            except:
+                print(modelname, 'is not exsist model file!')
+                return None, None
 
 
 
@@ -312,7 +323,6 @@ def create_urdf_obj(
     fix_root_link = True
 )->sapienp.PhysxArticulation: 
     modeldir = "./models/"+modelname+"/"
-    file_name = modeldir + "base.glb"
     json_file_path = modeldir + 'model_data.json'
     
     try:
@@ -331,3 +341,56 @@ def create_urdf_obj(
     
     object.set_root_pose(pose)
     return object, model_data
+
+# create obj model from ycb repo
+def create_obj_ycb(
+    scene: sapien.Scene,
+    pose: sapien.Pose,
+    modelname: str,
+    scale=(1, 1, 1),
+    convex=False,
+    is_static=False,
+    model_id=None,
+    model_z_val=False
+) -> sapien.Entity:
+    # 获取项目根目录
+    project_root = "/home/jerry/code/RoboTwin"
+    modeldir = os.path.join(project_root, "ycb_urdfs/ycb_assets", modelname, "google_16k")
+    
+    if model_id is None:
+        file_name = os.path.join(modeldir, "textured.obj")
+        json_file_path = os.path.join(modeldir, "model_data.json")
+    else:
+        file_name = os.path.join(modeldir, f"textured{model_id}.obj")
+        json_file_path = os.path.join(modeldir, f"model_data{model_id}.json")
+
+    # 检查文件是否存在
+    if not os.path.exists(file_name):
+        raise FileNotFoundError(f"OBJ file not found: {file_name}")
+
+    builder = scene.create_actor_builder()
+    if is_static:
+        builder.set_physx_body_type("static")
+    else:
+        builder.set_physx_body_type("dynamic")
+
+
+    if convex:
+        builder.add_multiple_convex_collisions_from_file(
+            filename=file_name,
+            scale=scale
+        )
+    else:
+        builder.add_nonconvex_collision_from_file(
+            filename=file_name,
+            scale=scale
+        )
+
+    builder.add_visual_from_file(
+        filename=file_name,
+        scale=scale
+    )
+    mesh = builder.build(name=modelname)
+    mesh.set_pose(pose)
+
+    return mesh, None

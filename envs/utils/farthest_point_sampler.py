@@ -9,7 +9,7 @@ import torchvision
 from termcolor import cprint
 import re
 import time
-
+import sys
 
 import numpy as np
 import torch
@@ -20,6 +20,7 @@ import pickle
 
 
 def fps(points, num_points=1024, use_cuda=True):
+    sys.path.append('')
 
     K = [num_points]
     if use_cuda:
