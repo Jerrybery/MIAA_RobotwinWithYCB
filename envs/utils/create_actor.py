@@ -354,7 +354,7 @@ def create_obj_ycb(
     model_z_val=False
 ) -> sapien.Entity:
     # 获取项目根目录
-    project_root = "/home/jerry/code/RoboTwin"
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     modeldir = os.path.join(project_root, "ycb_urdfs/ycb_assets", modelname, "google_16k")
     
     if model_id is None:
