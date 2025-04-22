@@ -58,8 +58,8 @@ class obj_obs(Base_task):
         # creat wall
         self.wall = create_box(
             self.scene,
-            sapien.Pose(p=[0, 3.65, 1.5]),
-            half_size=[3, 0.6, 1.5],
+            sapien.Pose(p=[0, 2.65, 1.5]),
+            half_size=[3, 0.6,1.5],
             color=(1, 0.9, 0.9), 
             name='wall',
         )
